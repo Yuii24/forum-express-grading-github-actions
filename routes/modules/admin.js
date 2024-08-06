@@ -6,7 +6,6 @@ const categoryController = require('../../controllers/category-controller')
 const upload = require('../../middleware/multer')
 
 // const { authenticatedAdmin } = require('../../middleware/auth')
-// this is ffor test
 
 router.get('/restaurants/create', adminController.createRestaurant)
 router.get('/restaurants/:id/edit', adminController.editRestaurant)
