@@ -18,6 +18,8 @@ router.post('/signin', passport.authenticate('local', { failureRedirect: '/signi
 
 router.get('/logout', userController.logout)
 
+router.get('/restaurants/:id', authenticated, restController.getRestaurant)
+
 router.get('/restaurants', authenticated, restController.getRestaurants)
 router.get('/user', authenticated, adminController.getUsers)
 
