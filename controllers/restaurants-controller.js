@@ -36,9 +36,9 @@ const restaurantController = {
       nest: true,
       include: Category
     })
-      .then(restaurants => {
-        console.log(restaurants)
-        return res.render('dashboard')
+      .then(restaurant => {
+        console.log(restaurant)
+        return res.render('dashboard', { restaurant })
       })
       .catch(err => next(err))
   }
