@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 const passport = require('../config/passport')
 const admin = require('./modules/admin')
-const restController = require('../controllers/restaurants-controller')
+const restsController = require('../controllers/restaurants-controller')
+const restController = require('../controllers/restaurant-controller')
 const userController = require('../controllers/user-controller')
 const adminController = require('../controllers/admin-controller')
 
@@ -21,7 +22,7 @@ router.get('/logout', userController.logout)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants/:id/dashboard/', authenticated, restController.getdashboard)
 
-router.get('/restaurants', authenticated, restController.getRestaurants)
+router.get('/restaurants', authenticated, restsController.getRestaurants)
 router.get('/user', authenticated, adminController.getUsers)
 
 router.use('/', (req, res) => {
