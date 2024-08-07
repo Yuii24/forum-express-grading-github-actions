@@ -1,6 +1,47 @@
 const { Restaurant, Category } = require('../models')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const resaturantsController = {
+  getRestaurants: (req, res, next) => {
+    const DEFAULT_LIMIT = 9
+
+    const categoryId = Number(req.query.categoryId) || ''
+
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT
+    const offset = getOffset(limit, page)
+
+    // 下方的展開運算值內容等與這兩行:
+    // 『 const where = {}
+    //    if (categoryId) where.categoryId = categoryId  』
+
+    return Promise.all([
+      Restaurant.findAndCountAll({
+        include: Category,
+        where: {
+          ...categoryId ? { categoryId } : {}
+        },
+        limit,
+        offset,
+        nest: true,
+        raw: true
+      }),
+      Category.findAll({ raw: true })
+    ])
+      .then(([restaurants, categories]) => {
+        const data = restaurants.rows.map(r => ({
+          ...r,
+          description: r.description.substring(0, 50)
+        }))
+        return res.render('restaurants', {
+          restaurants: data,
+          categories,
+          categoryId,
+          pagination: getPagination(limit, page, restaurants.count)
+        })
+      })
+      .catch(err => next(err))
+  },
   getRestaurant: (req, res, next) => {
     return Restaurant.findByPk(req.params.id, {
       include: Category // 拿出關聯的 Category model
@@ -29,37 +70,6 @@ const resaturantsController = {
         return res.render('dashboard', { restaurant })
       })
 
-      .catch(err => next(err))
-  },
-  getRestaurants: (req, res, next) => {
-    const categoryId = Number(req.query.categoryId) || ''
-
-    // 下方的展開運算值內容等與這兩行:
-    // 『 const where = {}
-    //    if (categoryId) where.categoryId = categoryId  』
-
-    return Promise.all([
-      Restaurant.findAll({
-        include: Category,
-        where: {
-          ...categoryId ? { categoryId } : {}
-        },
-        nest: true,
-        raw: true
-      }),
-      Category.findAll({ raw: true })
-    ])
-      .then(([restaurants, categories]) => {
-        const data = restaurants.map(r => ({
-          ...r,
-          description: r.description.substring(0, 50)
-        }))
-        return res.render('restaurants', {
-          restaurants: data,
-          categories,
-          categoryId
-        })
-      })
       .catch(err => next(err))
   }
 }
