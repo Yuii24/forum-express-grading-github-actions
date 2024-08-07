@@ -24,7 +24,7 @@ const adminController = {
     const { name, tel, address, openingHours, description, categoryId } = req.body
     if (!name) throw new Error('Restaurant name is required!')
 
-    // 等於 cost file = req.file
+    // 等於 cost file = req.file/
     const { file } = req
 
     localFileHandler(file).then(filePath => {
