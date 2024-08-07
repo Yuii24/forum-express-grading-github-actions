@@ -1,4 +1,4 @@
-const { Restaurant, Category } = require('../models')
+/* const { Restaurant, Category } = require('../models')
 
 const restaurantController = {
   getRestaurants: (req, res, next) => {
@@ -33,4 +33,4 @@ const restaurantController = {
       .catch(err => next(err))
   }
 }
-module.exports = restaurantController
+module.exports = restaurantController */
