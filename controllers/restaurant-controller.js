@@ -16,7 +16,7 @@ const resaturantsController = {
       })
       .catch(err => next(err))
   },
-  getdashboard: (req, res, next) => {
+  getDashboard: (req, res, next) => {
     return Restaurant.findByPk(req.params.id, {
       raw: true,
       nest: true,
