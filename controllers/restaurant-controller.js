@@ -61,18 +61,31 @@ const resaturantsController = {
       .catch(err => next(err))
   },
   getDashboard: (req, res, next) => {
-    return Restaurant.findByPk(req.params.id, {
-      raw: true,
-      nest: true,
-      include: Category
-    })
-      .then(restaurant => {
-        if (!restaurant) throw new Error("Restaurant didn't exist!")
-
-        console.log(restaurant)
-        return res.render('dashboard', { restaurant })
+    const restaurantId = req.params.id
+    return Promise.all([
+      Restaurant.findByPk(req.params.id, {
+        raw: true,
+        nest: true,
+        include: Category
+      }),
+      Comment.findAndCountAll({
+        include: Restaurant,
+        where: {
+          restaurantId: restaurantId
+        },
+        nest: true,
+        raw: true
       })
+    ]).then(([restaurant, comment]) => {
+      if (!restaurant) throw new Error("Restaurant didn't exist!")
 
+      console.log(restaurant)
+      console.log(comment)
+      return res.render('dashboard', {
+        restaurant,
+        commentcounts: comment.count
+      })
+    })
       .catch(err => next(err))
   }
 }
