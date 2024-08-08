@@ -2,9 +2,11 @@ const express = require('express')
 const router = express.Router()
 const passport = require('../config/passport')
 const admin = require('./modules/admin')
+
 const restController = require('../controllers/restaurant-controller')
 const userController = require('../controllers/user-controller')
 const adminController = require('../controllers/admin-controller')
+const commentController = require('../controllers/comment-controller')
 
 const { authenticated, authenticatedAdmin } = require('../middleware/auth')
 const { generalErrorHandler } = require('../middleware/error-handler')
@@ -24,9 +26,9 @@ router.get('/restaurants/:id/dashboard/', authenticated, restController.getDashb
 router.get('/restaurants', authenticated, restController.getRestaurants)
 router.get('/user', authenticated, adminController.getUsers)
 
-router.use('/', (req, res) => {
-  res.redirect('/restaurants')
-})
+router.get('/', (req, res) => { res.redirect('/restaurants') })
+
+router.post('/comments', authenticated, commentController.postComment)
 
 router.use('/', generalErrorHandler)
 
