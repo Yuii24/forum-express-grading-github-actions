@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const { Comment, User } = require('../models')
+const { User, Comment, Restaurant } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 
 const userController = {
@@ -44,44 +44,59 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res, next) => {
-    const userId = req.params.id
-    return User.findByPk(userId, {
-      raw: true,
-      nest: true
+    return User.findByPk(req.params.id, {
+      include: [
+        {
+          model: Comment,
+          include: [
+            {
+              model: Restaurant,
+              attributes: ['image', 'name']
+            }
+          ]
+        }
+      ]
     })
-      .then((user) => {
-        if (!user) throw new Error("User didn't exist!")
+      .then(user => {
+        if (!user) throw new Error("User didn't exist.")
+        const commentData = user.Comments ? user.Comments : []
 
-        console.log(user)
-        return res.render('users/profile', { user })
+        console.log()
+        res.render('users/profile', {
+          user: user.toJSON(),
+          commentData
+        })
       })
       .catch(err => next(err))
-    // return Promise.all([
-    //   User.findByPk(userId, {
-    //     raw: true,
-    //     nest: true,
-    //     include: Comment
-    //   }),
-    //   Comment.findAndCountAll({
-    //     include: User,
-    //     where: {
-    //       userId: userId
-    //     },
-    //     nest: true,
-    //     raw: true
-    //   })
-    // ]).then(([user, comment]) => {
-    //   if (!user) throw new Error("User didn't exist!")
-
-    //   console.log(user)
-    //   console.log(comment)
-    //   return res.render('users/profile', {
-    //     user,
-    //     commentcounts: comment.count
-    //   })
-    // })
-    //   .catch(err => next(err))
   },
+
+  // 想請助教幫我確認一下為什麼下面的程式碼跑test會出現 TypeError: Cannot read properties of null (reading 'args') //
+  //   return Promise.all([
+  //     User.findByPk(req.params.id, {
+  //       include: Comment
+  //     }),
+  //     Comment.findAndCountAll({
+  //       include: [
+  //         User,
+  //         Restaurant
+  //       ],
+  //       where: {
+  //         userId: req.params.id
+  //       },
+  //       raw: true,
+  //       nest: true
+  //     })
+  //   ]).then(([user, comment]) => {
+  //     if (!user) throw new Error("User didn't exist!")
+
+  //     return res.render('users/profile', {
+  //       user: user.toJSON(),
+  //       commentcounts: comment.count,
+  //       comment: comment.rows
+  //     })
+  //   })
+  //     .catch(err => next(err))
+  // },
   editUser: (req, res, next) => {
     const userId = req.params.id
     return User.findByPk(userId, {
