@@ -8,7 +8,7 @@
       <div class="card-body">
         <h5 class="card-title">{{user.name}}</h5>
         <p class="card-text">{{user.email}}</p>
-        <p class="card-text">{{commentcounts}} 篇已發表的評論</p>
+        <p class="card-text">{{comment.length}} 篇已發表的評論</p>
         <a href="/users/{{user.id}}/edit" class="btn btn-primary">Edit</a>
       </div>
     </div>
@@ -19,7 +19,7 @@
     <h3>已評論的餐廳</h3>
   </div>
   <div style="background: white; height: auto" class="d-flex flex-row bd-highlight mb-3 align-items-center flex-wrap">
-    {{#each commentData}}
+    {{#each comment}}
     <a href="/restaurants/{{this.dataValues.restaurantId}}">
       <img src="{{this.dataValues.Restaurant.dataValues.image}}" class="img-thumbnail ms-1"
         style="max-width: 100px; max-height: 100px;" alt="{{this.dataValues.Restaurant.dataValues.name}}">
