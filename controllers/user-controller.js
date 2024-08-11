@@ -59,17 +59,15 @@ const userController = {
     })
       .then(user => {
         if (!user) throw new Error("User didn't exist.")
-        const commentData = user.Comments ? user.Comments : []
+        const comment = user.Comments ? user.Comments : []
 
-        console.log()
         res.render('users/profile', {
           user: user.toJSON(),
-          commentData
+          comment
         })
       })
       .catch(err => next(err))
   },
-
   // 想請助教幫我確認一下為什麼下面的程式碼跑test會出現 TypeError: Cannot read properties of null (reading 'args') //
   //   return Promise.all([
   //     User.findByPk(req.params.id, {
@@ -88,7 +86,6 @@ const userController = {
   //     })
   //   ]).then(([user, comment]) => {
   //     if (!user) throw new Error("User didn't exist!")
-
   //     return res.render('users/profile', {
   //       user: user.toJSON(),
   //       commentcounts: comment.count,
@@ -127,7 +124,6 @@ const userController = {
         image: filePath || user.image
       })
         .then(() => {
-          if (user.name === 'admin2') console.log('true')
           req.flash('success_messages', '使用者資料編輯成功')
           res.redirect(`/users/${user.id}`)
         })
