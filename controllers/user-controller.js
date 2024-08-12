@@ -211,14 +211,17 @@ const userController = {
       include: [{ model: User, as: 'Followers' }]
     })
       .then(users => {
-        users = users.map(user => ({
-          ...user.toJSON(),
-          followerCount: user.Followers.length,
-          isFollowed: req.user.Followings.some(f => f.id === user.id)
-        }))
+        const result = users
+          .map(user => ({
+            ...user.toJSON(),
+            followerCount: user.Followers.length,
+            isFollowed: req.user.Followings.some(f => f.id === user.id)
+          }))
+          .sort((a, b) => b.followerCount - a.followerCount)
+
         // users = users.sort((a, b) => b.followerCount - a.followerCount)
 
-        res.render('top-users', { users: users })
+        res.render('top-users', { users: result })
       })
       .catch(err => next(err))
   },
