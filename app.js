@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 const path = require('path')
 const express = require('express')
 const handlebar = require('express-handlebars')
@@ -8,17 +11,19 @@ const methodOverride = require('method-override')
 const handlebarsHelpers = require('./helpers/handlebars-helpers')
 const { getUser } = require('./helpers/auth-helpers')
 
-const routes = require('./routes')
+const { pages, apis } = require('./routes')
 
 const app = express()
 const port = process.env.PORT || 3000
 const SESSION_SECRET = 'secret'
+console.log(process.env.JWT_SECRET)
 
 // const db = require('./models')
 
 app.engine('hbs', handlebar({ extname: '.hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(passport.initialize())
@@ -33,7 +38,9 @@ app.use((req, res, next) => {
   res.locals.user = getUser(req)
   next()
 })
-app.use(routes)
+
+app.use(pages)
+app.use('/api', apis)
 
 app.listen(port, () => {
   console.info(`Example app listening on port ${port}!`)

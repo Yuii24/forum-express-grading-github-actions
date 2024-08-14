@@ -1,8 +1,8 @@
 const { User, Comment, Restaurant, Category } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
-const resaturantsController = {
-  getRestaurants: (req, res, next) => {
+const restaurantServices = {
+  getRestaurants: (req, res, cb) => {
     const DEFAULT_LIMIT = 9
 
     const categoryId = Number(req.query.categoryId) || ''
@@ -29,22 +29,25 @@ const resaturantsController = {
       Category.findAll({ raw: true })
     ])
       .then(([restaurants, categories]) => {
-        const FavoritedRestaurantsId = req.user && req.user.FavoritedRestaurants.map(fr => fr.id)
-        const LikedRestaurantId = req.user && req.user.LikedRestaurants.map(lr => lr.id)
+        // const FavoritedRestaurantsId = req.user && req.user.FavoritedRestaurants.map(fr => fr.id)
+        // const LikedRestaurantId = req.user && req.user.LikedRestaurants.map(lr => lr.id)
+
+        const FavoritedRestaurantsId = req.user?.FavoritedRestaurants.map(fr => fr.id) ? req.user.FavoritedRestaurants.map(fr => fr.id) : []
+        const LikedRestaurantId = req.user?.LikedRestaurants.map(lr => lr.id) ? req.user.LikedRestaurants.map(lr => lr.id) : []
         const data = restaurants.rows.map(r => ({
           ...r,
-          description: r.description.substring(0, 50),
+          description: r.description?.substring(0, 50),
           isFavorited: FavoritedRestaurantsId.includes(r.id),
           isLiked: LikedRestaurantId.includes(r.id)
         }))
-        return res.render('restaurants', {
+        return cb(null, {
           restaurants: data,
           categories,
           categoryId,
           pagination: getPagination(limit, page, restaurants.count)
         })
       })
-      .catch(err => next(err))
+      .catch(err => cb(err))
   },
   getRestaurant: (req, res, next) => {
     return Restaurant.findByPk(req.params.id, {
@@ -145,4 +148,4 @@ const resaturantsController = {
   }
 }
 
-module.exports = resaturantsController
+module.exports = restaurantServices
