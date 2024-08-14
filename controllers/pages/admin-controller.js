@@ -1,18 +1,22 @@
 const { Restaurant, User, Category } = require('../../models')
 const { localFileHandler } = require('../../helpers/file-helpers')
+const adminServices = require('../../services/admin-services')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
-    Restaurant.findAll({
-      raw: true,
-      nest: true,
-      include: [Category]
-    })
-      .then(restaurants => {
-        res.render('admin/restaurants', { restaurants })
-      })
-      .catch(err => next(err))
+    adminServices.getRestaurants(req, res, (err, data) => err ? next(err) : res.render('admin/restaurants', data))
   },
+  // getRestaurants: (req, res, next) => {
+  //   Restaurant.findAll({
+  //     raw: true,
+  //     nest: true,
+  //     include: [Category]
+  //   })
+  //     .then(restaurants => {
+  //       res.render('admin/restaurants', { restaurants })
+  //     })
+  //     .catch(err => next(err))
+  // },
   createRestaurant: (req, res, next) => {
     return Category.findAll({
       raw: true
@@ -96,15 +100,18 @@ const adminController = {
     })
   },
   deleteRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id)
-      .then(restaurant => {
-        if (!restaurant) throw new Error("Restaurant didn't exist!")
-
-        return restaurant.destroy()
-      })
-      .then(() => res.redirect('/admin/restaurants'))
-      .catch(err => next(err))
+    adminServices.deleteRestaurant(req, res, (err, data) => err ? next(err) : res.redirect('/admin/restaurants', data))
   },
+  // deleteRestaurant: (req, res, next) => {
+  //   Restaurant.findByPk(req.params.id)
+  //     .then(restaurant => {
+  //       if (!restaurant) throw new Error("Restaurant didn't exist!")
+
+  //       return restaurant.destroy()
+  //     })
+  //     .then(() => res.redirect('/admin/restaurants'))
+  //     .catch(err => next(err))
+  // },
   getUsers: (req, res, next) => {
     return User.findAll({
       raw: true
