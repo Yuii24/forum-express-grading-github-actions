@@ -1,3 +1,4 @@
+require('dotenv').config()
 const path = require('path')
 const express = require('express')
 const handlebar = require('express-handlebars')
@@ -13,12 +14,14 @@ const { pages, apis } = require('./routes')
 const app = express()
 const port = process.env.PORT || 3000
 const SESSION_SECRET = 'secret'
+console.log(process.env.JWT_SECRET)
 
 // const db = require('./models')
 
 app.engine('hbs', handlebar({ extname: '.hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(passport.initialize())

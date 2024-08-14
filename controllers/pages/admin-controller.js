@@ -18,35 +18,42 @@ const adminController = {
   //     .catch(err => next(err))
   // },
   createRestaurant: (req, res, next) => {
-    return Category.findAll({
-      raw: true
-    })
-      .then(categories => res.render('admin/create-restaurant', { categories }))
-      .catch(err => next(err))
+    adminServices.createRestaurant(req, res, (err, data) => err ? next(err) : res.render('admin/create-restaurant', data))
+    // return Category.findAll({
+    //   raw: true
+    // })
+    //   .then(categories => res.render('admin/create-restaurant', { categories }))
+    //   .catch(err => next(err))
   },
   postRestaurants: (req, res, next) => {
-    const { name, tel, address, openingHours, description, categoryId } = req.body
-    if (!name) throw new Error('Restaurant name is required!')
+    adminServices.postRestaurants(req, res, (err, data) => {
+      if (err) return next(err)
 
-    // 等於 cost file = req.file/
-    const { file } = req
-
-    localFileHandler(file).then(filePath => {
-      return Restaurant.create({
-        name: name,
-        tel: tel,
-        address: address,
-        openingHours: openingHours,
-        description: description,
-        image: filePath || null,
-        categoryId: categoryId
-      })
+      req.flash('success_messages', 'restaurant was successfully created')
+      res.redirect('/admin/restaurants')
     })
-      .then(() => {
-        req.flash('success_messages', 'restaurant was successfully created')
-        res.redirect('/admin/restaurants')
-      })
-      .catch(err => next(err))
+    // const { name, tel, address, openingHours, description, categoryId } = req.body
+    // if (!name) throw new Error('Restaurant name is required!')
+
+    // // 等於 cost file = req.file/
+    // const { file } = req
+
+    // localFileHandler(file).then(filePath => {
+    //   return Restaurant.create({
+    //     name: name,
+    //     tel: tel,
+    //     address: address,
+    //     openingHours: openingHours,
+    //     description: description,
+    //     image: filePath || null,
+    //     categoryId: categoryId
+    //   })
+    // })
+    //   .then(() => {
+    //     req.flash('success_messages', 'restaurant was successfully created')
+    //     res.redirect('/admin/restaurants')
+    //   })
+    //   .catch(err => next(err))
   },
   getRestaurant: (req, res, next) => {
     Restaurant.findByPk(req.params.id, {
@@ -100,7 +107,7 @@ const adminController = {
     })
   },
   deleteRestaurant: (req, res, next) => {
-    adminServices.deleteRestaurant(req, res, (err, data) => err ? next(err) : res.redirect('/admin/restaurants', data))
+    adminServices.deleteRestaurant(req, res, (err, data) => err ? next(err) : res.redirect('/admin/restaurants'))
   },
   // deleteRestaurant: (req, res, next) => {
   //   Restaurant.findByPk(req.params.id)
